@@ -2,10 +2,12 @@ import pygame
 import sys
 import os
 import random
+from pygame.locals import
+from sys import maxint
 
 pygame.init()   ##Initialize pygame
 
-def get_subj_info():                        ##Get subject information
+def get_subj_info():                              ## Get subject information
     subj_id = raw_input('Student ID: ')
     subj_mane = raw_input('Student Name: ')
     subj_gender = raw_input('Student Gender: ')
@@ -13,18 +15,25 @@ def get_subj_info():                        ##Get subject information
     return [subj_id, subj_name, subj_gender, subj_age]
 subj = get_subj_info():
 
-win = pygame.display.set_mode((1024,768),pygame.HWSURFACE|pygame.DOUBLEBUF)     ##Create a window
+win = pygame.display.set_mode((1024,768),pygame.HWSURFACE|pygame.DOUBLEBUF)     ## Create a window
 
-left = (300,320)              ##Position
+left = (300,320)              ## Position
 right = (800,320)             
-red = (255,0,0)               ##Color
-blue = (0,0,255)    
+red = (255,0,0)               ## Color
+blue = (0,0,255) 
+black = (0, 0, 0)
 random.seed = 1000
 
-trials = [['L','R', 'z'], ['L','B', '/'], ['R','R', 'z'], ['R','B', '/']]       ##Trial list
+trials = [['L','R', 'z'], ['L','B', '/'], ['R','R', 'z'], ['R','B', '/']]       ## Trial list
 
+def text_msg(msg, loc):
+"""display a short text message"""
+text_font = pygame.font.SysFont('Arial', 24)
+txt_msg = txt_font.render(msg, True, black)
+win.blit(txt_msg, (loc[0]-txt_msg.get_width()/2, loc[1]-txt_msg.get_height()/2)
+pygame.display.flip()
 
-def wait4key(duration, keys_allowed):    ##Wait for a key press         
+def wait4key(duration, keys_allowed):    ## Wait for a key press         
       """wait for a key response.
       
       duration: want for how long
@@ -37,11 +46,11 @@ t_start = pygame.time.get_ticks()
 pygame.event.clear()
 while not (got_key or time_out):
     
-    t_now = pygame.time.get_ticks()            ##Check for time out
+    t_now = pygame.time.get_ticks()            ## Check for time out
     if t_now - t_start >= duration:
          time_out = True
               
-    for ev in pygame.event.get():              ##Check for key responses
+    for ev in pygame.event.get():              ## Check for key responses
               if ev.type == KEYDOWN:
                      if ev.key in keys_allowed:
                      resp_time = t _now
@@ -52,7 +61,7 @@ while not (got_key or time_out):
     else:
        return [t_start, None, None]
        
-def run _trial(pars, data_file, subj_info):                             ##Run a single trial
+def run _trial(pars, data_file, subj_info):                             ## Run a single trial
        """pairs should be list that specifies the location and color of the stimulus, as well as the correct key response, such as ['R', 'B', '/']"""
        loc, col, cor_resp = pars
        if l = "R": loc = right
@@ -60,7 +69,10 @@ def run _trial(pars, data_file, subj_info):                             ##Run a 
        if c = "R": col = red
        if c = "B": col = blue
        
-    loc_rand = random.choice([0, 1])
+       text_msg('+',(550,320))                         ## Fixation
+       pygame.time.wait(500)
+       
+           loc_rand = random.choice([0, 1])
     if loc_rand = 0:
        loc = left
     else:
@@ -70,12 +82,12 @@ def run _trial(pars, data_file, subj_info):                             ##Run a 
     else:
         col = blue
         
-    pygame.draw.circle(win, col, loc, 30)
+    pygame.draw.circle(win, col, loc, 30)               ## Target
     pygame.display.flip()
     tar_resp = wait4key(1500, [K_z, K_SLASH])
     print tar_resp
     
-    trial_data = subj_info + pars + tar_resp             ##Write data to file
+    trial_data = subj_info + pars + tar_resp            ## Write data to file
     trial_data = map(str, trial_data) 
     trial_data = ','.join(trial_data + '\n')
     data_file.write(trial_data)
@@ -86,7 +98,9 @@ def run _trial(pars, data_file, subj_info):                             ##Run a 
 if not os.path.exist('data_file'):
       os.mkdir('data_file')
 
-data_file = open('data_file/' + '_'.join(subj[:2]) + '.csv', 'w')       ##Real experiment begins
+data_file = open('data_file/' + '_'.join(subj[:2]) + '.csv', 'w')       ## Real experiment begins  ##Open a data file
+text_msg('Press Z to RED, press / to BLUE. Press <SPACE> to start', (550,320))
+wait4key(maxint, [K_SPACE])
 
 test_trials = trials[:]*2
 random.shuffle(test_trials)
@@ -94,7 +108,7 @@ random.shuffle(test_trials)
 for t in test_trials*2
      run_trial(t, data_file, subj)
     
-  data_file.close()             ##Close data file
+  data_file.close()             ## Close data file
   
-  sys.exit()                    ##exit
+  sys.exit()                    ## Exit
      
