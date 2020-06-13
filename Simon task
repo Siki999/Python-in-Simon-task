@@ -1,0 +1,100 @@
+import pygame
+import sys
+import os
+import random
+
+pygame.init()   ##Initialize pygame
+
+def get_subj_info():                        ##Get subject information
+    subj_id = raw_input('Student ID: ')
+    subj_mane = raw_input('Student Name: ')
+    subj_gender = raw_input('Student Gender: ')
+    subj_age = raw_input('Student Age: ')
+    return [subj_id, subj_name, subj_gender, subj_age]
+subj = get_subj_info():
+
+win = pygame.display.set_mode((1024,768),pygame.HWSURFACE|pygame.DOUBLEBUF)     ##Create a window
+
+left = (300,320)              ##Position
+right = (800,320)             
+red = (255,0,0)               ##Color
+blue = (0,0,255)    
+random.seed = 1000
+
+trials = [['L','R', 'z'], ['L','B', '/'], ['R','R', 'z'], ['R','B', '/']]       ##Trial list
+
+
+def wait4key(duration, keys_allowed):    ##Wait for a key press         
+      """wait for a key response.
+      
+      duration: want for how long
+      keys_allowed: which key are allowed,
+      keys_allowed should be list, such as [K_z, K_SLASH]."""
+
+got_key = False
+time_out = False
+t_start = pygame.time.get_ticks()
+pygame.event.clear()
+while not (got_key or time_out):
+    
+    t_now = pygame.time.get_ticks()            ##Check for time out
+    if t_now - t_start >= duration:
+         time_out = True
+              
+    for ev in pygame.event.get():              ##Check for key responses
+              if ev.type == KEYDOWN:
+                     if ev.key in keys_allowed:
+                     resp_time = t _now
+                     resp_key = pygame.key.name(ev.key)
+                     got_key = True
+    if got_key:
+       return [t_start, resp_time, resp_key]
+    else:
+       return [t_start, None, None]
+       
+def run _trial(pars, data_file, subj_info):                             ##Run a single trial
+       """pairs should be list that specifies the location and color of the stimulus, as well as the correct key response, such as ['R', 'B', '/']"""
+       loc, col, cor_resp = pars
+       if l = "R": loc = right
+       if l = "L": loc = left
+       if c = "R": col = red
+       if c = "B": col = blue
+       
+    loc_rand = random.choice([0, 1])
+    if loc_rand = 0:
+       loc = left
+    else:
+        loc = right
+    col_rand = random.choice([0, 1])
+    if col_rand == 0
+    else:
+        col = blue
+        
+    pygame.draw.circle(win, col, loc, 30)
+    pygame.display.flip()
+    tar_resp = wait4key(1500, [K_z, K_SLASH])
+    print tar_resp
+    
+    trial_data = subj_info + pars + tar_resp             ##Write data to file
+    trial_data = map(str, trial_data) 
+    trial_data = ','.join(trial_data + '\n')
+    data_file.write(trial_data)
+    
+    pygame.display.flip()
+    pygame.time.wait(500)
+
+if not os.path.exist('data_file'):
+      os.mkdir('data_file')
+
+data_file = open('data_file/' + '_'.join(subj[:2]) + '.csv', 'w')       ##Real experiment begins
+
+test_trials = trials[:]*2
+random.shuffle(test_trials)
+
+for t in test_trials*2
+     run_trial(t, data_file, subj)
+    
+  data_file.close()             ##Close data file
+  
+  sys.exit()                    ##exit
+     
